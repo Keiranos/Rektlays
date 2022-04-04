@@ -1,19 +1,24 @@
 import discord
 from discord.ext import commands
 import datetime as dt
-from config import QUEUE, STAFF, RED, WHITELIST
+from config import RED, GREEN
+import aiosqlite
 
 Approved = "👍"
 Denied = "👎"
 
 
-class Listener(commands.Cog, name="Listener"):
+class Filter(commands.Cog, name="Filter"):
     def __init__(self, bot):
         self.bot = bot
         self.start_time = dt.datetime.now()
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        async with aiosqlite.connect("data.db") as db:
+            WHITELIST = await db.execute("SELECT Whitelist FROM Config")
+            WHITELIST = await WHITELIST.fetchone()
+            WHITELIST = WHITELIST[0]
         whitelist = message.guild.get_role(WHITELIST)
         if whitelist not in message.author.roles:
             if message.attachments:
@@ -21,7 +26,15 @@ class Listener(commands.Cog, name="Listener"):
                 for info in message.attachments:
                     try:
                         AttachmentURL = info.proxy_url
+                        async with aiosqlite.connect("data.db") as db:
+                            QUEUE = await db.execute("SELECT Queue FROM Config")
+                            QUEUE = await QUEUE.fetchone()
+                            QUEUE = QUEUE[0]
                         channel = self.bot.get_channel(QUEUE)
+                        async with aiosqlite.connect("data.db") as db:
+                            STAFF = await db.execute("SELECT Staff FROM Config")
+                            STAFF = await STAFF.fetchone()
+                            STAFF = STAFF[0]
                         msg = await channel.send(
                             f"<@&{STAFF}> A new message with an attachment has been detected! Please check this "
                             f"and react bellow to approve this message! UserID - {message.author.id} - "
@@ -63,6 +76,21 @@ class Listener(commands.Cog, name="Listener"):
         else:
             pass
 
+    @commands.command()
+    async def config(self, ctx, Queue: discord.TextChannel, Whitelist: discord.Role, Staff: discord.Role):
+        QueueID = Queue.id
+        WhitelistID = Whitelist.id
+        StaffID = Staff.id
+        async with aiosqlite.connect("data.db") as db:
+            await db.execute("UPDATE Config SET Queue = ?, Whitelist = ?, Staff = ?",
+                             (QueueID, WhitelistID, StaffID))
+            await db.commit()
+        em = discord.Embed(title="Success!", description=f"The Queue channel is now {Queue.mention}\n"
+                                                         f"The Whitelist role is now {Whitelist.mention}\n"
+                                                         f"The Staff role is now {Staff.mention}",
+                           colour=GREEN)
+        await ctx.send(embed=em)
+
 
 def setup(bot):
-    bot.add_cog(Listener(bot))
+    bot.add_cog(Filter(bot))

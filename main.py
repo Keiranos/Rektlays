@@ -28,5 +28,6 @@ for filename in os.listdir('./cogs'):
         print("Loading: cogs." + filename[:-3])
         bot.load_extension("cogs." + filename[:-3])
 
+
 # Start the bot
 bot.run(getenv("BOT_TOKEN"))
