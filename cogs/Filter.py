@@ -92,5 +92,6 @@ class Filter(commands.Cog, name="Filter"):
                            colour=GREEN)
         await ctx.send(embed=em)
 
+
 def setup(bot):
     bot.add_cog(Filter(bot))
