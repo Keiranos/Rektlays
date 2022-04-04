@@ -15,12 +15,13 @@ class Filter(commands.Cog, name="Filter"):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        Member = message.guild.get_member(message.author.id)
         async with aiosqlite.connect("data.db") as db:
             WHITELIST = await db.execute("SELECT Whitelist FROM Config")
             WHITELIST = await WHITELIST.fetchone()
             WHITELIST = WHITELIST[0]
         whitelist = message.guild.get_role(WHITELIST)
-        if whitelist not in message.author.roles or message.author.roles is None:
+        if whitelist not in Member.roles or Member.roles is None:
             if message.attachments:
                 await message.delete(delay=1)
                 for info in message.attachments:
@@ -90,7 +91,6 @@ class Filter(commands.Cog, name="Filter"):
                                                          f"The Staff role is now {Staff.mention}",
                            colour=GREEN)
         await ctx.send(embed=em)
-
 
 def setup(bot):
     bot.add_cog(Filter(bot))
