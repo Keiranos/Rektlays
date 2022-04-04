@@ -26,7 +26,7 @@ bot.remove_command("help")
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         print("Loading: cogs." + filename[:-3])
-        bot.load_extension("cogs." + filename[:-3])
+        await bot.load_extension("cogs." + filename[:-3])
 
 
 # Start the bot
