@@ -21,13 +21,14 @@ bot = Bot(command_prefix=commands.when_mentioned_or(PREFIX), messages=True, case
           allowed_mentions=discord.AllowedMentions(roles=False, everyone=False), intents=intents)
 
 bot.remove_command("help")
-
 # Load cogs
-for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        print("Loading: cogs." + filename[:-3])
-        await bot.load_extension("cogs." + filename[:-3])
+async def load_extensions():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            print("Loading: cogs." + filename[:-3])
+            await bot.load_extension("cogs." + filename[:-3])
 
+await load_extensions()
 
 # Start the bot
 bot.run(getenv("BOT_TOKEN"))
