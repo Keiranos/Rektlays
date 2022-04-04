@@ -14,6 +14,7 @@ class Bot(commands.Bot):
         startup = bot.user.name + " is running"
         print(startup)
         print("-" * len(startup))  # Print a line of dashes as long as the last print line for neatness
+        await load_extensions()
 
 
 intents = discord.Intents.all()
@@ -28,7 +29,6 @@ async def load_extensions():
             print("Loading: cogs." + filename[:-3])
             await bot.load_extension("cogs." + filename[:-3])
 
-await load_extensions()
 
 # Start the bot
 bot.run(getenv("BOT_TOKEN"))
