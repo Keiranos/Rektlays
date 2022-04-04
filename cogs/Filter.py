@@ -20,7 +20,7 @@ class Filter(commands.Cog, name="Filter"):
             WHITELIST = await WHITELIST.fetchone()
             WHITELIST = WHITELIST[0]
         whitelist = message.guild.get_role(WHITELIST)
-        if whitelist not in message.author.roles:
+        if whitelist not in message.author.roles or message.author.roles is None:
             if message.attachments:
                 await message.delete(delay=1)
                 for info in message.attachments:
