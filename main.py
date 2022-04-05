@@ -7,15 +7,6 @@ from config import OWNERS, PREFIX
 
 load_dotenv()
 
-
-# Load cogs
-async def load_extensions():
-    for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
-            print("Loading: cogs." + filename[:-3])
-            bot.load_extension("cogs." + filename[:-3])
-
-
 class Bot(commands.Bot):
     async def on_ready(self):
         # Print startup message
@@ -29,6 +20,13 @@ bot = Bot(command_prefix=commands.when_mentioned_or(PREFIX), messages=True, case
           allowed_mentions=discord.AllowedMentions(roles=False, everyone=False), intents=intents)
 
 bot.remove_command("help")
+
+
+# Load cogs
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        print("Loading: cogs." + filename[:-3])
+        bot.load_extension("cogs." + filename[:-3])
 
 
 # Start the bot
